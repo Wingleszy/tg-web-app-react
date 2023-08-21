@@ -10,7 +10,7 @@ export const Form = () => {
     const {tg} = useTelegram()
 
     useEffect(() => {
-        tg.MainButton.SetParams({
+        tg.MainButton.setParams({
             text: 'Отправить данные'
         })
     })
