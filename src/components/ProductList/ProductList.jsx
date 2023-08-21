@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import './ProductList.css'
 import { ProductItem } from '../ProductItem/ProductItem'
 import { useTelegram } from '../../hooks/useTelegram'
@@ -17,14 +17,36 @@ const products = [
 const getTotalPrice = (items) => {
   return items.reduce((acc, item) => {
     return acc += item.price
-  }, 0) 
+  }, 0)
 }
 
 export const ProductList = () => {
 
   const [addedItems, setAddedItems] = useState([])
 
-  const {tg} = useTelegram()
+  const { tg } = useTelegram()
+
+  const onSendData = useCallback(() => {
+    const data = {
+      products: addedItems,
+      totalPrice: getTotalPrice(addedItems),
+      queryId
+    }
+    fetch('http://localhost:3000', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)
+    })
+  }, [addedItems])
+
+  useEffect(() => {
+    tg.onEvent('mainButtonClicked', onSendData)
+    return () => {
+      tg.offEvent('mainButtonClicked', onSendData)
+    }
+  }, [onSendData, tg])
 
   const onAdd = (product) => {
     const alreadyAdded = addedItems.find(item => item.id === product.id)
@@ -38,7 +60,7 @@ export const ProductList = () => {
 
     setAddedItems(newItems)
 
-    if(newItems.length === 0 ) {
+    if (newItems.length === 0) {
       tg.MainButton.hide()
     } else {
       tg.MainButton.show()
