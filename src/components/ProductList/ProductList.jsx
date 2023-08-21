@@ -24,7 +24,7 @@ export const ProductList = () => {
 
   const [addedItems, setAddedItems] = useState([])
 
-  const { tg } = useTelegram()
+  const { tg, queryId } = useTelegram()
 
   const onSendData = useCallback(() => {
     const data = {
@@ -39,7 +39,7 @@ export const ProductList = () => {
       },
       body: JSON.stringify(data)
     })
-  }, [addedItems])
+  }, [addedItems, queryId])
 
   useEffect(() => {
     tg.onEvent('mainButtonClicked', onSendData)
